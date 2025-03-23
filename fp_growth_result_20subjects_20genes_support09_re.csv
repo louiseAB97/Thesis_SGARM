@@ -1,0 +1,7 @@
+support,itemsets
+0.95,frozenset({'APLNR_upregulated'})
+0.95,frozenset({'ALDOC_upregulated'})
+0.95,frozenset({'AADAC_downregulated'})
+0.9,"frozenset({'ALDOC_upregulated', 'APLNR_upregulated'})"
+0.9,"frozenset({'ALDOC_upregulated', 'AADAC_downregulated'})"
+0.9,"frozenset({'APLNR_upregulated', 'AADAC_downregulated'})"
