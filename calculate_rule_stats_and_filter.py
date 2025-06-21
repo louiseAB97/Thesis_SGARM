@@ -1,6 +1,5 @@
 
 ### This function can be imported into rule_quality folder and was tested to work with Aerial version 0.3.0
-
 def calculate_rule_stats_and_filter(rules, transactions, max_workers=1, min_support=0.6, min_confidence=0.8):
     """
     Calculate rule quality stats for the given set of rules based on the input transactions.
@@ -14,8 +13,8 @@ def calculate_rule_stats_and_filter(rules, transactions, max_workers=1, min_supp
     dataset_coverage = np.zeros(num_transactions, dtype=bool)
 
     def process_rule(rule, min_support=min_support, min_confidence=min_confidence):
-        antecedents_indices = [vector_tracker_list.index(ant) for ant in rule['antecedents']]
-        consequent_index = vector_tracker_list.index(rule['consequent'])
+        antecedents_indices = [vector_tracker_list.index(ant) for ant in rule['antecedents']] # feature indices of antecedent
+        consequent_index = vector_tracker_list.index(rule['consequent']) # feature indices of the consequent
 
         # Find transactions where all antecedents are present
         antecedent_matches = np.all(transactions.iloc[:, antecedents_indices] == 1, axis=1)
@@ -33,12 +32,11 @@ def calculate_rule_stats_and_filter(rules, transactions, max_workers=1, min_supp
 
         rule['support'] = float(round(rule_support, 3))
         rule['confidence'] = float(round(rule_confidence, 3))
-        rule['zhangs_metric'] = float(round(calculate_zhangs_metric(rule_support, support_body, support_head), 3))
-        rule['rule_coverage'] = float(
-            round(antecedents_occurrence_count / num_transactions if num_transactions else 0, 3))
-
         if rule_support > min_support and rule_confidence > min_confidence:
-                return antecedent_matches, rule
+            rule['zhangs_metric'] = float(round(calculate_zhangs_metric(rule_support, support_body, support_head), 3))
+            rule['rule_coverage'] = float(
+                round(antecedents_occurrence_count / num_transactions if num_transactions else 0, 3))
+            return antecedent_matches, rule
         else:
             return None
     
@@ -47,6 +45,7 @@ def calculate_rule_stats_and_filter(rules, transactions, max_workers=1, min_supp
     # ADDED 
     results = [res for res in results if res is not None]
     # Aggregate dataset coverage and collect updated rules
+    # By the end, dataset_coverage contains all data points that match at least one rule
     updated_rules = []
     for antecedent_matches, rule in results:
         dataset_coverage |= antecedent_matches
